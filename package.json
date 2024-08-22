@@ -1,0 +1,32 @@
+{
+  "name": "@mjackson/file-browser",
+  "version": "0.0.0",
+  "description": "",
+  "author": "Michael Jackson <mjijackson@gmail.com>",
+  "type": "module",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@mjackson/lazy-file": "^1.0.0",
+    "mrmime": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.0",
+    "prettier": "^3.3.3",
+    "tsimp": "^2.0.11",
+    "typescript": "^5.5.4"
+  },
+  "scripts": {
+    "clean": "git clean -fdX .",
+    "build": "tsc --outDir dist --project tsconfig.lib.json",
+    "test": "node --import tsimp/import --test ./src/**/*.spec.ts",
+    "prepare": "pnpm run build",
+    "version": "node scripts/version.js"
+  },
+  "keywords": [
+    "directory",
+    "file",
+    "fs",
+    "filesystem"
+  ]
+}
