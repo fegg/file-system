@@ -1,11 +1,23 @@
 {
-  "name": "@mjackson/open",
+  "name": "@mjackson/file-browser",
   "version": "0.0.0",
   "description": "",
   "author": "Michael Jackson <mjijackson@gmail.com>",
-  "type": "module",
-  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mjackson/file-browser.git"
+  },
   "license": "MIT",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./dist/file-browser.js",
+    "./package.json": "./package.json"
+  },
   "dependencies": {
     "@mjackson/lazy-file": "^1.1.0",
     "mrmime": "^2.0.0"

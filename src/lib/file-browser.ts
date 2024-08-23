@@ -3,16 +3,17 @@ import * as path from "node:path";
 import { LazyFileContent, LazyFile } from "@mjackson/lazy-file";
 import { lookup } from "mrmime";
 
+export interface OpenOptions {
+  autoCreate?: boolean;
+}
+
 /**
  * Opens and returns the directory with the given name.
  *
  * By default if the directory does not exist it will be created. You can opt out of this behavior
  * by using `{ autoCreate: false }` in the options.
  */
-export function open(
-  name: string,
-  options: DirectoryOpenOptions = {}
-): Directory {
+export function open(name: string, options?: OpenOptions): Directory {
   let stats: fs.Stats;
   try {
     stats = fs.statSync(name);
@@ -53,21 +54,17 @@ export function openFile(name: string): File {
   return createFile(name, stats);
 }
 
-interface CommonFileProperties {
+interface FileCommon {
   dir: Directory;
   dirname: string;
   name: string;
   path: string;
 }
 
-export interface DirectoryOpenOptions {
-  autoCreate?: boolean;
-}
-
 /**
  * A directory on the file system.
  */
-export class Directory implements CommonFileProperties {
+export class Directory implements FileCommon {
   #path: string;
 
   constructor(name: string) {
@@ -107,7 +104,7 @@ export class Directory implements CommonFileProperties {
    * A generator for all subdirectories of this directory.
    */
   *subdirs(filter = /.*/): Generator<Directory> {
-    for (let entry of this.entries) {
+    for (let entry of this.entries()) {
       if (entry.isDirectory() && filter.test(entry.name)) {
         yield new Directory(path.join(this.path, entry.name));
       }
@@ -117,14 +114,14 @@ export class Directory implements CommonFileProperties {
   /**
    * An array of the names of all entries in this directory.
    */
-  get entryNames(): string[] {
+  entryNames(): string[] {
     return fs.readdirSync(this.path);
   }
 
   /**
    * An array of all entries in this directory.
    */
-  get entries(): fs.Dirent[] {
+  entries(): fs.Dirent[] {
     return fs.readdirSync(this.path, { withFileTypes: true });
   }
 
@@ -147,7 +144,7 @@ export class Directory implements CommonFileProperties {
    * A generator for all files in this directory.
    */
   *files(filter = /.*/): Generator<File> {
-    for (let entry of this.entries) {
+    for (let entry of this.entries()) {
       if (entry.isFile() && filter.test(entry.name)) {
         let filename = path.join(this.path, entry.name);
         yield createFile(filename, fs.statSync(filename));
@@ -173,7 +170,7 @@ export class Directory implements CommonFileProperties {
 /**
  * A regular file on the file system.
  */
-export class File extends LazyFile implements CommonFileProperties {
+export class File extends LazyFile implements FileCommon {
   #path: string;
 
   constructor(

@@ -2,7 +2,7 @@ import * as assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import * as path from "node:path";
 
-import { open, Directory, File } from "./open.js";
+import { open, Directory, File } from "./file-browser.js";
 
 const __dirname = new URL(".", import.meta.url).pathname;
 
@@ -26,7 +26,7 @@ describe("open", () => {
   });
 
   it("lists all entry names in a directory", () => {
-    assert.deepEqual(open(fixtures).entryNames, [
+    assert.deepEqual(open(fixtures).entryNames(), [
       "a.txt",
       "b.txt",
       "c.txt",
@@ -37,7 +37,9 @@ describe("open", () => {
 
   it("lists all entries in a directory", () => {
     assert.deepEqual(
-      open(fixtures).entries.map(entry => entry.name),
+      open(fixtures)
+        .entries()
+        .map(entry => entry.name),
       ["a.txt", "b.txt", "c.txt", "sub", "sub2"]
     );
   });
