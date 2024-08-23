@@ -2,12 +2,26 @@ import * as assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import * as path from "node:path";
 
-import { open, Directory, File } from "./file-browser.js";
+import { Directory, open, File, openFile } from "./file-system.js";
 
 const __dirname = new URL(".", import.meta.url).pathname;
+const fixtures = path.join(__dirname, "../test/fixtures");
 
 describe("open", () => {
-  let fixtures = path.join(__dirname, "../test/fixtures");
+  it("throws when a directory does not exist and autoCreate is false", () => {
+    assert.throws(() => open("does-not-exist", { autoCreate: false }));
+  });
+
+  it("automatically creates a directory if it does not exist", async () => {
+    let name = path.join(fixtures, "does-not-exist");
+    let dir = open(name);
+    assert.ok(dir instanceof Directory);
+    assert.equal(dir.name, "does-not-exist");
+    assert.equal(dir.path, name);
+    assert.equal(dir.dirname, fixtures);
+
+    await dir.delete();
+  });
 
   it("knows its parent directory", () => {
     assert.equal(open(fixtures).dir.name, "test");
@@ -116,5 +130,34 @@ describe("open", () => {
     }
     text += decoder.decode();
     assert.equal(text, "This is file a.\n");
+  });
+});
+
+describe("openFile", () => {
+  it("opens an existing file", async () => {
+    let name = path.join(fixtures, "a.txt");
+    let file = openFile(name);
+    assert.ok(file instanceof File);
+    assert.equal(file.name, "a.txt");
+    assert.equal(file.path, name);
+    assert.equal(file.dirname, fixtures);
+    assert.equal(await file.text(), "This is file a.\n");
+  });
+
+  it("automatically creates a new file if it does not exist", async () => {
+    let name = path.join(fixtures, "does-not-exist.txt");
+    let file = openFile(name);
+    assert.ok(file instanceof File);
+    assert.equal(file.name, "does-not-exist.txt");
+    assert.equal(file.path, name);
+    assert.equal(file.dirname, fixtures);
+    assert.equal(await file.text(), "");
+
+    await file.delete();
+  });
+
+  it("throws when a file does not exist and autoCreate is false", () => {
+    let name = path.join(fixtures, "does-not-exist.txt");
+    assert.throws(() => openFile(name, { autoCreate: false }));
   });
 });
