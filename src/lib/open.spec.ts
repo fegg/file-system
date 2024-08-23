@@ -9,6 +9,22 @@ const __dirname = new URL(".", import.meta.url).pathname;
 describe("open", () => {
   let fixtures = path.join(__dirname, "../test/fixtures");
 
+  it("knows its parent directory", () => {
+    assert.equal(open(fixtures).dir.name, "test");
+  });
+
+  it("knows its dirname", () => {
+    assert.equal(open(fixtures).dirname, path.resolve(__dirname, "../test"));
+  });
+
+  it("knows its name", () => {
+    assert.equal(open(fixtures).name, "fixtures");
+  });
+
+  it("knows its path", () => {
+    assert.equal(open(fixtures).path, fixtures);
+  });
+
   it("lists all entry names in a directory", () => {
     assert.deepEqual(open(fixtures).entryNames, [
       "a.txt",
